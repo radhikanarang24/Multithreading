@@ -1,0 +1,158 @@
+MULTITHREADING
+https://www.youtube.com/watch?v=8e_IvPvr-NY&list=PLhs1urmduZ2_ZFO6vu63QNWTL5XHriWKu
+
+#1: Introduction to Multithreading
+
+Processes are different from threads. We can see no of processes running in task manager ( not the threads – only total no of threads are visible)
+e.g. Chrome here has multiple processes running
+
+A process can have multiple threads. A program can have multiple processes.
+
+
+This returns the current thread which is running. At this time, it is the main thread which is running.
+
+
+We can set the name of thread as well
+
+
+If we sleep this thread, we can check this process under netbeans IDE process in Task Manager. Its not a separate process here as its not a standalone process. We are running this process inside Netbeans IDE.
+
+
+
+#2: Why do we need multiple threads ?
+
+
+Basically, for a CPU intensive task the UI stops responding if the main thread does all the computation. To handle this, we are creating a new thread here to do all the calculations here.
+
+#3: Creating thread using Runnable
+
+
+
+
+
+In this manner above, I love Java is printed by another thread and not by main thread.
+We can use main thread to print something else in this case
+
+
+The lines are printed in a random manner. To make them print in an order we have thread synchronization.
+ #4: Creating new thread by extending Thread
+Another way to create thread by extending thread class as it implements Runnable itself
+
+
+
+
+
+#5: Setting Thread Priority to control CPU allocation
+
+When we want to give more priority to a few threads as compared to others. Let’s say we have 3K threads in task manager we see. And there are 8 cores or processors, then it might allot some threads to be processed on priority
+The more the priority, the more CPU cycles it will get.
+
+
+
+Using max priority for thread 1 we were able to save around 300ms of CPU time.
+ When we create a thread by default its priority is 5 (NORMAL_PRIORITY).
+All threads created in Java has a priority assigned to it. By default the priority is 5 and minimum priority is 1. Maximum priority a thread can have is 10. When there are more than one thread in Java, the CPU resource allocation will be usually dependent based on the priority. A higher priority thread will be getting more share of CPU than a low priority thread compared to it.
+
+Using multiple threads can optimize CPU usage. In the video here, with 1 thread CPU utilized was 16% whereas with 5 threads it was 65% utilized
+
+
+ #6: Thread Status and Join
+
+
+To check if a thread is alive
+
+System.exit causes the main thread to exit without waiting for other thread to complete its execution
+
+Thread.join makes the main thread wait for other thread to complete its execution and then exit the system
+Thread.join(millisecs) -> to ask the main thread to wait for other thread for max for specified millisecs
+Java Thread API provides option to check whether a thread is running or not using the method ThreadObject.isAlive(). Join is used to wait a thread to finish. The join() method waits for a thread to die. It causes the currently running threads to stop executing until the thread it joins with completes its task. Join also provides a overridden method with wait time which when provided will wait for a maximum of given time for the thread to die.
+#7: How to safely stop a thread
+
+The problem with thread.join is it will wait for specified millisecs and if process isn’t completed in that time, it will kill the thread.
+Killing a thread prematurely can cause problems such as inconsistent data.
+Thread.stop() has been deprecated for long time now and java suggest to keep a variable of your own to
+
+
+
+
+
+If customThread completes in less than 3 seconds, we can exit the main thread in this way
+In this chapter, we will talk about properly closing a thread. The built-in method Thread.stop() is deprecated and we should implement our own method for closing a thread properly. It is really important that we properly close a thread, especially if the thread does work on things that can lead to data loss, data inconsistency etc. In this chapter, we will look into a method where we make use of a flag to properly stop a thread if needed.
+#8: Thread Synchronization - Why and How
+
+In this chapter, we will learn about thread synchronization. When we work on parallel execution, we will soon come to a point where data becomes inconsistent because of simultaneous access of shared resources from multiple threads. In this video, we will see a real example of synchronization issue and will fix it using synchronization with "synchronized" keyword.
+
+https://github.com/afsalashyana/Java-Multithreading-Tutorial/tree/master/src/multithreading
+
+
+When we use same resource list for both threads we are getting random letters
+
+
+To solve this we add syncronised keyword for resources we want to sync, names in this case (as message is different object we don’t sync that)
+
+
+
+
+Also theres no problem and we don’t need synchronized keyword if the lists were different in treads and not shared
+
+
+#9: Thread Synchronization with Java Locks
+This chapter discusses about another way to implement synchronization in Java. We have seen about the requirement of synchronization in previous chapter. Java provides locks via java.util.concurrent.Locks class. Locks provide option to provide single-threaded access to a block of code by locking it using Locks. The ReentrantLock class implements the Lock interface and provides synchronization to methods while accessing shared resources. It is mandatory to unlock once the lock is acquired. So it is better to put it inside a finally block.
+
+
+
+We have to share the locks between different threads, so make them static
+Lock.lock() to acquire lock – will acquire lock for only one thread
+
+
+Mandatory to unlock a lock so that other threads are not starved
+
+Advantages of lock is we can lock in one block or method and unlock it in other block or method
+Whereas for synchronized it has to be in one same block
+Fairness parameter for Reentrant lock:
+
+
+With fairness as true, locks are acquired in order the threads requested
+#10: Producer consumer problem
+
+In this chapter, we will discuss about the famous producer-consumer problem is thread synchronization. It is also known as bounded buffer problem. The problem deals with two different threads working on a shared queue. In this video, first we will understand the problem and then will solve it using wait() and notify() methods. The java.lang.Object.wait() causes current thread to wait until another thread invokes the notify() method.
+
+
+Producer produces some data at adds it to the queue ( at max it can add n items to the queue). So if the no of items in queue becomes n then it should not add more items.
+Consumer consumes items from the queue. It should not consume if the queue is empty.
+
+
+Wait() method makes the thread to wait until some other thread notifies
+Notify() is to notify the threads that producer has produced or consumer is going to consume
+Producer and consumer are running parallelly – they are 2 different threads
+
+
+
+ #11: Daemon Threads
+
+In this chapter, we will talk about Daemon threads in Java. When a normal thread is running in background, it does not allow the JVM to exit until that thread is complete. A daemon thread is a thread that does not prevent the JVM from exiting when the program finishes but the thread is still running. You can set a thread as daemon thread using java.lang.Thread#setDaemon(boolean) function.
+
+
+
+Non dameon thread is the thread like here which doesn’t allow the main thread to exit even when the main program is completed because the other thread is still running.
+
+
+
+If you cant use daemon thread and you have to exit the main program you can use system.exit() to exit the program. It kills all the running threads and exits
+#12: ThreadPools and Executor Services
+
+In this chapter, we will discuss about ThreadPools in Java. When you have a set of tasks that has to be executed in parallel, ThreadPools are a good choice. As the name suggests, ThreadPools are collection of Threads that can be used and reused for different tasks. We can create ThreadPool using java.util.concurrent.ExecutorService.
+
+
+
+ThreadPool is set of threads, say 6 threads will execute the 6 tasks and then next set of 6 tasks will be processed. The overhead of maintaining threads start and execution is reduced using thread pools
+
+
+Executor service maintains a queue internally
+
+Here we have used newSingleThreadExecutor which initializes only single thread in threadpool and max wait time was more here.
+
+Here we have used newFixedThreadpool to 4 and 4 threads were initialized. Max wait time being 300ms here
+
+Here we used newCacheThreadPool and using this JVM takes care of no of threads to be created in threadpool depending on no of tasks. So here it created 6 threads and max wait time is zero
+
